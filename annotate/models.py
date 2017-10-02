@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 
 
 class Entry(models.Model):
-    DIARY, TWEET = 'DIARY', 'TWEET'
+    DIARY, TWEET = '日記', 'Tweet'
     SOURCE_TYPES = (
         (DIARY, DIARY),
         (TWEET, TWEET),
@@ -23,7 +23,7 @@ class Entry(models.Model):
 
 
 class Annotation(models.Model):
-    UNDONE, PENDING, DONE = 'UNDONE', 'PENDING', 'DONE'
+    UNDONE, PENDING, DONE = '未完成', 'Pass', '完成'
     STATUS_CHOICES = (
         (UNDONE, UNDONE),
         (PENDING, PENDING),

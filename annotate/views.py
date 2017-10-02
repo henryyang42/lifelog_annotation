@@ -44,7 +44,7 @@ def auth_required(view):
 def annotate(request):
     user = request.user
     annotation_status = get_annotation_status(user)
-
+    Anno = Annotation
     if request.method == 'GET':
         id_ = request.GET.get('id')
         if id_:
@@ -176,6 +176,6 @@ def list_sentence(request):
     except EmptyPage:
         # If page is out of range (e.g. 9999), deliver last page of results.
         annotations = paginator.page(paginator.num_pages)
-
+    Anno = Annotation
     annotation_status = get_annotation_status(user)
     return render(request, 'list_sentence.html', locals())

@@ -7,6 +7,8 @@ import json
 from collections import defaultdict
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+import logging
+logger = logging.getLogger(__name__)
 
 
 def color_map(index):
@@ -31,15 +33,6 @@ def get_annotation_status(user):
     }
 
 
-def auth_required(view):
-    """A decorator to ensure user has login."""
-    def f(request, *args, **kwargs):
-        if request.user.is_authenticated:
-            return view(request, *args, **kwargs)
-        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
-    return f
-
-
 @login_required(login_url='/annotation/login')
 def annotate(request):
     user = request.user
@@ -57,7 +50,7 @@ def annotate(request):
             else:
                 all_finished = True
                 return render(request, 'annotate_entry.html', locals())
-
+        logger.info('%s ANNOTATIING annotation.id=%s' % (user, annotation.id))
         # pre_annotated_result
         pa = {
             'checkEvent': 'notEvent',
@@ -102,7 +95,7 @@ def annotate(request):
 
     elif request.method == 'POST':
         POST = request.POST
-
+        logger.info('%s POSTED %s' % (user, json.dumps(request.POST)))
         entry = get_object_or_404(Entry, id=POST['id'])
         annotation = get_object_or_404(Annotation, user=user, entry=entry)
         annotated_result = {
@@ -151,7 +144,7 @@ def annotate(request):
         annotation.annotation = json.dumps(annotated_result, ensure_ascii=False)
         annotation.update_time = datetime.now()
         annotation.save()
-        print(annotation.id, annotation.annotation)
+        logger.info('%s UPDATED annotation.id=%s annotation.annotation=%s' % (user, annotation.id, annotation.annotation))
 
         return redirect('/annotation/')
 

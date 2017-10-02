@@ -148,3 +148,47 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = None
 
 # Login
 LOGIN_URL = '/annotation/admin/login/'
+
+# Logging
+# https://docs.djangoproject.com/en/1.11/topics/logging/
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '[%(levelname)s] [%(asctime)s] [%(pathname)s] %(message)s'
+        },
+        'simple': {
+            'format': '%(levelname)s %(message)s'
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': 'info.log',
+            'formatter': 'verbose'
+        },
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'login': {
+            'handlers': ['file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'annotate': {
+            'handlers': ['file'],
+            'level': 'INFO',
+            'propagate': True,
+        }
+    },
+}

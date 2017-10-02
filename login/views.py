@@ -3,6 +3,8 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import AuthenticationForm
 
 from django.conf import settings
+import logging
+logger = logging.getLogger(__name__)
 
 
 def auth_login(request):
@@ -18,6 +20,7 @@ def auth_login(request):
                 password=user_form.cleaned_data['password'])
             # user.backend = 'django.contrib.auth.backends.ModelBackend'
             login(request, user)
+            logger.info('%s login' % user)
             return redirect(next_page)
         else:
             return render(request, 'login.html', {'form': user_form})
@@ -25,5 +28,6 @@ def auth_login(request):
 
 
 def auth_logout(request):
+    logger.info('%s logout' % request.user)
     logout(request)
     return redirect('/annotation/')

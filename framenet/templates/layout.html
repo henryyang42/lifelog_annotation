@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Personal Event Annotation</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="https://cdn.rawgit.com/kflorence/jquery-deserialize/master/src/jquery.deserialize.js"></script>
+    <style>
+    /* @override
+  http://localhost:5000/static/css/annotate.css
+  http://127.0.0.1:5000/static/css/annotate.css
+*/
+
+/* Sentence display */
+div.token {
+  /* float: left; */
+  display: inline-block;
+  margin-left: 0.4em;
+  margin-bottom: 0.5em;
+  font-size: 1.4em;
+  text-align: center;
+}
+
+div.word a.active {
+  font-weight: bold;
+  text-decoration: underline;
+  color: brown;
+}
+
+div.word {
+  color: gray;
+}
+
+
+div.word-index {
+  font-size: 0.5em;
+  color: gray;
+  text-align: center;
+  margin-top:  -6px;
+}
+
+div.pos {
+  display: none;
+  font-size:  0.7em;
+}
+
+#annotation-box .frames-for-token {
+  height: 60%;
+  overflow-y: auto;
+  overflow-x: visible;
+  padding: 0em 2em;
+}
+
+
+#annotation-box .tab-content {
+  padding-right: 1em;
+  padding-left: 1em;
+}
+
+.word-arg-marker {
+  height: 16px;
+  margin-top: 2px;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.word-arg-marker.inactive {
+  background-color: white !important;
+}
+
+.word-arg-marker.active {
+  font-weight: bold;
+  color: brown;}
+
+
+span.color-box {
+  margin-left: 0.2em;
+  border: 1px solid lightgray;
+  width: 1em;
+  height:  1em;
+  display:  inline-block;
+  vertical-align: center;
+}
+
+/* Form controls */
+.frame-element label {
+  font-size: 1.1em;
+  margin-right: 1em;
+}
+
+.frame-element input {
+  font-size: 1.2em;
+  margin-right: 0.5em;
+  width: 50px;;
+  margin-top: 0.4em;
+}
+
+.frame-element span.word-index-help {
+  font-size: 1em;
+  color: gray;
+}
+
+
+    </style>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+      <div class="navbar navbar-inverse" role="navigation">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="/annotation/show">Personal Event Annotation</a>
+        </div>
+
+      {% block annotation_progress %}
+
+      {% endblock %}
+
+        <!--<div class="collapse navbar-collapse">-->
+          <!--<ul class="nav navbar-nav">-->
+            <!--<li class="active"><a href="#">Home</a></li>-->
+            <!--<li><a href="#about">About</a></li>-->
+            <!--<li><a href="#contact">Contact</a></li>-->
+          <!--</ul>-->
+        <!--</div>&lt;!&ndash;/.nav-collapse &ndash;&gt;-->
+    </div>
+
+    {% block body %}
+
+    {% endblock %}
+
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+  </body>
+</html>

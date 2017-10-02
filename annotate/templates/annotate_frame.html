@@ -1,0 +1,153 @@
+<div class="sentence lead">
+{% for token in sentence %}
+<div class="token" id="token-string-{{ token.token_i }}">
+
+    <div class="word">
+    {% if token.frames %}
+    <a href="#token-tab-{{ token.token_i }}" data-toggle="tab" data-token-i="{{ token.token_i }}">
+                        {{ token.token }}
+                    </a> {% else %} {{ token.token }} {% endif %}
+    </div>
+    <div class="word-index">{{ token.token_i }}</div>
+
+    <div class="pos">{{ token.pos }}</div>
+</div>
+{% endfor %}
+</div>
+
+<div id="annotation-box" style="clear: both">
+
+<h3>Select frame</h3>
+
+<!--form role="form" id="frame-form"></form-->
+    <div class="tab-content">
+    {% for pa in pre_annotations %}
+    <div class="tab-pane {% if loop.index == 1 %}active{% endif %}" id="token-tab-{{ pa.i }}" data-token-i="{{ pa.i }}">
+        <div class="form-group">
+        <label for="frame-select-{{ pa.i }}">Frame</label>
+        <select class="frame-select form-control" id="frame-select-{{ pa.i }}" name="select-{{ pa.i }}">
+          <option value="">...</option>
+            {% for frame in pa.frames %}
+              <option value="{{ pa.i }}-{{ frame.eng_name }}" {% if frame.selected %} selected {% endif %}>{{ frame.eng_name }}/{{ frame.chi_name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="frames-for-token">
+        {% for frame in pa.frames %} {% include "frame.html" %} {% endfor %}
+        </div>
+
+    </div>
+    {% endfor %}
+    </div>
+
+</div>
+
+
+
+<script>
+  /*function saveState() {
+    $.ajax({
+      url: "save/{{ id }}",
+      data: $("#frame-form").serializeArray(),
+      type: 'POST',
+    }).error(function () {
+      console.log("Automatic save not working")
+    })
+  }*/
+
+  function activeTokenIndex() {
+    return $(".tab-pane.active").data("token-i");
+  }
+
+
+  function colorSentence() {
+    // Reset to no initial coloring
+    $(".word-arg-marker").remove()
+
+
+    // Re-add the colors
+    $("select.frame-select").each(function (_, frameSelect) {
+      var selectedFrame = $(frameSelect).val()
+      if (selectedFrame != "") {
+        var evokerIndex = selectedFrame.split("-")[0]
+        console.log(selectedFrame.split("-"))
+        $("input[name^='" + selectedFrame + "']").each(function (_, argInput) {
+          var selectedIndex = $(argInput).val()
+          if (selectedIndex == "") return
+          var st, ed;
+          var split_ind = selectedIndex.split('-')
+          console.log(split_ind)
+          if (split_ind.length == 2) {
+            st = Number(split_ind[0])
+            ed = Number(split_ind[1])
+          } else if (split_ind.length == 1) {
+            st = ed = Number(split_ind[0])
+          } else {
+            return
+          }
+          console.log(st, ed)
+          var feAbbrev = $(argInput).data("abbrev")
+          for (var selectedIndex = st; selectedIndex <= ed; selectedIndex++) {
+            var elem = $(document.createElement('div'))
+            elem.attr("id", "#token-string-" + selectedIndex +
+              " div.word-arg-marker.evoker-" + evokerIndex)
+            elem.text(feAbbrev)
+            elem.addClass("word-arg-marker");
+            elem.addClass("evoker-" + evokerIndex);
+            elem.addClass("evoker");
+
+            if (evokerIndex == activeTokenIndex()) {
+              elem.addClass("active");
+            }
+
+            $("#token-string-" + selectedIndex).prepend(elem)
+          }
+        })
+      }
+    })
+  }
+
+  $(document).ready(function () {
+    $('select.frame-select').change(function (e) {
+      var selectedVal = $(e.target).val()
+      var parentTab = $(e.target).closest(".tab-pane");
+      console.log(selectedVal, parentTab);
+      $(".frame", parentTab).hide();
+      if (selectedVal != "") {
+        var tokenIndex = selectedVal.split("-")[0];
+        $("#" + selectedVal, parentTab).show();
+
+      }
+    })
+
+    // Any changes to the form trigger a redraw of the sentence,
+    // as well as serialization of the state
+    $("form :input")
+      .keyup(colorSentence)
+      .change(colorSentence)
+      //.keyup(saveState)
+      //.change(saveState);
+
+    // Activate the first token
+    $('.token a').first().addClass("active")
+
+    //
+    $('select.frame-select').change();
+
+    // Event listener for clicks on frame-evoking words in sentence
+    $('.word a').click(function (e) {
+      var tokenIndex = $(this).data("token-i")
+      console.log($(this).data("token-i"), "clicked")
+      $('.evoker').removeClass('active')
+      $('.evoker-' + tokenIndex).addClass('active')
+
+      $('.word a').removeClass('active')
+      $(this).addClass('active')
+    })
+  });
+
+
+
+
+</script>

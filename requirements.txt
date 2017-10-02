@@ -1,0 +1,4 @@
+Django==1.11.5
+jieba==0.39
+pytz==2017.2
+django-bootstrap-form==3.3

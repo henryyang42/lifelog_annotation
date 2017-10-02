@@ -1,0 +1,54 @@
+{% extends "layout.html" %}
+
+{% block annotation_progress %}
+<div class="progress navbar-right navbar-text" style="width: 50%; margin: 1%">
+  <div class="progress-bar" style="width: {{ annotation_status.remaining_pct }}%">
+    <a href="/annotation/show?status=UNDONE" style="color:aliceblue">{{ annotation_status.remaining }} Left</a>
+  </div>
+  <div class="progress-bar progress-bar-warning" style="width: {{ annotation_status.pending_pct }}%">
+    <a href="/annotation/show?status=PENDING" style="color:aliceblue">{{ annotation_status.pending }} Pending</a>
+  </div>
+  <div class="progress-bar progress-bar-success" style="width: {{ annotation_status.done_pct }}%">
+    <a href="/annotation/show?status=DONE" style="color:aliceblue">{{ annotation_status.done }} Done</a>
+  </div>
+
+</div>
+<a class="navbar-brand" href="/annotation/logout/">Logout</a>
+
+{% endblock %}
+
+{% block body %}
+
+<div class="container-fluid">
+  <h2>Annotation Status</h2>
+  <table class="table table-striped">
+    <thead>
+    <tr>
+      <th style="width: 115pt">Last Modify</th>
+      <th>Content</th>
+      <th>Status</th>
+    </tr>
+    </thead>
+    <tbody>
+
+    {% for annotation in annotations %}
+      <tr>
+        <td>{{ annotation.update_time }}</td>
+        <td><a href="/annotation?id={{ annotation.entry.id }}">{{ annotation.entry }}</a></td>
+        <td>{{ annotation.status }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+
+  <ul class="pager">
+    {% if entries.has_previous %}
+      <li><a href="?page={{ annotations.previous_page_number }}">&larr; Previous</a></li>
+    {% endif %}
+    <span class="current">Page {{ annotations.number }} of {{ annotations.paginator.num_pages }}.</span>
+    {% if annotations.has_next %}
+      <li><a href="?page={{ annotations.next_page_number }}">Next &rarr;</a></li>
+    {% endif %}
+  </ul>
+</div>
+{% endblock body %}

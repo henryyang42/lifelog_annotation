@@ -1,0 +1,39 @@
+<div class="frame row" id="{{ pa.i }}-{{ frame.eng_name }}">
+  <div class="col-md-8">
+    <h4>Core</h4>
+    {% for fe in frame.fe_by_type.CORE %}
+    <div class="input-group frame-element">
+      <input class="word-index-input" size="2" data-abbrev="{{ fe.abbr }}" name="{{ pa.i }}-{{ frame.eng_name }}-{{fe.eng_name}}" value="{{ fe.value }}">
+      <label class="control-label">{{ fe.eng_name }}/{{ fe.chi_name }}</label>
+      <span class="word-index-help">{{ fe.description }}</span>
+    </div>
+    {% endfor %}
+
+    <h4>Non-Core</h4>
+    {% for fe in frame.fe_by_type.NON_CORE %}
+    <div class="input-group frame-element">
+      <input class="word-index-input" size="2" data-abbrev="{{ fe.abbr }}" name="{{ pa.i }}-{{ frame.eng_name }}-{{fe.eng_name}}" value="{{ fe.value }}">
+      <label class="control-label">{{ fe.eng_name }}/{{ fe.chi_name }}</label>
+      <span class="word-index-help">{{ fe.description }}</span>
+    </div>
+    {% endfor %}
+  </div>
+  <div class="col-md-4">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">{{ frame.eng_name }} / {{ frame.chi_name }}</h3>
+      </div>
+      <div class="panel-body">
+        <p>
+          {{ frame.description }}
+        </p>
+        <p>
+          See FrameNet's definition of
+          <a href="https://fndrupal.icsi.berkeley.edu/fndrupal/frame_report?name={{ frame.eng_name}}" target="_blank">{{ frame.eng_name}}</a>.
+        </p>
+
+      </div>
+    </div>
+
+  </div>
+</div>

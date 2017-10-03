@@ -49,20 +49,8 @@ from annotate.models import *
 """
 
 
-def add_frames(tokens):
-    tokens_ = []
-    for i, tok in enumerate(tokens):
-        tokens_.append({
-            'token': tok['token_cn'],
-            'pos': tok['pos'],
-            'frames': [lu['frame'] for lu in find_lu(name=tok['token_cn'])],
-            'token_i': i
-        })
-    return tokens_
-
-
 if __name__ == '__main__':
-    with open('data/diary_frames_cn.json') as f:
+    with open('data/diary_frames_cn.json', encoding='utf8') as f:
         frames = json.load(f)
 
     for i, frame in enumerate(frames):

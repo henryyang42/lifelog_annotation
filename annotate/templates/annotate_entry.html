@@ -18,7 +18,7 @@
   {{ entry.content }}
 </pre>
 
-<form name="annotation" action="/annotation/" method="post">
+<form class="form-horizontal" name="annotation" action="/annotation/" method="post">
   {% csrf_token %}
   <input type="hidden" name="user" value="{{ entry.author }}">
   <input type="hidden" name="id" value="{{ entry.id }}">
@@ -113,13 +113,12 @@
       <br>
     {% endif %}
     <hr>
-    <h2>標記 FrameNet</h2>
     {% include "annotate_frame.html" %}
   </div>
   <br>
   <br>
   <br>
-  <input type="submit" class="btn btn-primary" value="送出" id="submit" style="margin:2%">
+  <input type="submit" class="btn btn-primary" value="送出" id="submit" style="margin-top:2%">
 </form>
 
 

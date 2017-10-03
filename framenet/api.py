@@ -46,3 +46,15 @@ def tokenize_s(request):
     s = request.GET.get('s', '')
     tokens = tokenize(s)
     return JsonResponse(tokens, safe=False)
+
+
+def add_frames(tokens):
+    tokens_ = []
+    for i, tok in enumerate(tokens):
+        tokens_.append({
+            'token': tok['token_cn'],
+            'pos': tok['pos'],
+            'frames': [lu['frame'] for lu in find_lu(name=tok['token_cn'])],
+            'token_i': i
+        })
+    return tokens_

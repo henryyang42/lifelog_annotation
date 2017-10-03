@@ -127,7 +127,7 @@ def insert_lu(fname, lus):
 
 
 if __name__ == '__main__':
-    with open('data/CFN_Frames.json') as f:
+    with open('data/CFN_Frames.json', encoding='utf8') as f:
         frames = json.load(f)
     fname = set()
     for fid, frame in frames.items():
@@ -138,7 +138,7 @@ if __name__ == '__main__':
             print(frame['info']['eng_name'], 'Duplicate Frame, ignored')
         fname.add(frame['info']['eng_name'])
 
-    with open('data/CFN_Expand.json') as f:
+    with open('data/CFN_Expand.json', encoding='utf8') as f:
         frames = json.load(f)
         for fname, lus in frames.items():
             insert_lu(fname, lus)

@@ -2,12 +2,14 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import *
 from framenet.api import *
+from framenet.models import *
 from datetime import datetime
 import json
 from collections import defaultdict
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 import logging
+import jieba.posseg as pseg
 logger = logging.getLogger(__name__)
 
 
@@ -33,6 +35,15 @@ def get_annotation_status(user):
         'remaining': undone_ct,
         'undone': undone_ct
     }
+
+
+def add_lu(name, frame_id):
+    try:
+        pos = list(pseg.cut(name))[0].flag
+        frame = FrameNet.objects.get(id=frame_id)
+        LexUnit.objects.create(frame=frame, name=name, pos=pos)
+    except:
+        pass
 
 
 @login_required(login_url='/annotation/login')
@@ -148,6 +159,15 @@ def annotate(request):
         annotation.save()
         logger.info('%s UPDATED annotation.id=%s annotation.annotation=%s' % (user, annotation.id, annotation.annotation))
 
+        if 'add_lu' in POST.keys():
+            custom_lu_word = POST.get('custom_lu_word', '')
+            custom_lu_frame = POST.get('custom_lu_frame', '')
+            if custom_lu_word and custom_lu_frame:
+                add_lu(custom_lu_word, custom_lu_frame)
+                diary = json.loads(entry.raw)
+                entry.preprocessed_content = json.dumps({'tokens': add_frames(diary['tokens'])}, ensure_ascii=False)
+                entry.save()
+            return redirect('/annotation/?id=%d' % entry.id)
         return redirect('/annotation/')
 
 

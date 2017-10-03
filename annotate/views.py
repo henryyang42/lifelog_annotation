@@ -21,7 +21,7 @@ def get_annotation_status(user):
     done_ct = Annotation.objects.filter(user=user, status=Annotation.DONE).count()
     pending_ct = Annotation.objects.filter(user=user, status=Annotation.PENDING).count()
     undone_ct = Annotation.objects.filter(user=user, status=Annotation.UNDONE).count()
-    smoothing = 5000
+    smoothing = 200
     smct = len([ct for ct in [done_ct, pending_ct, undone_ct] if ct])
     return {
         'done_pct': done_ct and (done_ct + smoothing) / (all_ct + smct * smoothing) * 100,
@@ -29,7 +29,9 @@ def get_annotation_status(user):
         'remaining_pct': undone_ct and (undone_ct + smoothing) / (all_ct + smct * smoothing) * 100,
         'done': done_ct,
         'pending': pending_ct,
+        'pass': pending_ct,
         'remaining': undone_ct,
+        'undone': undone_ct
     }
 
 
@@ -172,3 +174,42 @@ def list_sentence(request):
     Anno = Annotation
     annotation_status = get_annotation_status(user)
     return render(request, 'list_sentence.html', locals())
+
+
+@login_required(login_url='/annotation/login')
+def progress(request):
+    user_progress = []
+    status = {
+        'not_event_cost': 0.0,
+        'has_event_cost': 0.0,
+        'anno_done_cost': 0.0,
+        'pass_cost': 0,
+        'not_event': 0,
+        'has_event': 0,
+        'anno_done': 0,
+        'pass': 0,
+        'undone': 0
+    }
+    for user in User.objects.all():
+        annotation_status = get_annotation_status(user)
+        annotation_status['has_event'], annotation_status['not_event'] = 0, 0
+        for annotation in Annotation.objects.filter(user=user, status=Annotation.DONE):
+            try:
+                anno = json.loads(annotation.annotation)
+                if anno['checkEvent'] == 'hasEvent':
+                    annotation_status['has_event'] += 1
+                elif anno['checkEvent'] == 'notEvent':
+                    annotation_status['not_event'] += 1
+            except:
+                pass
+        annotation_status['has_event_cost'] = annotation_status['has_event'] * 7.0
+        annotation_status['not_event_cost'] = annotation_status['not_event'] * 1.5
+        annotation_status['pass_cost'] = annotation_status['pass'] * 1.5
+        annotation_status['anno_done'] = annotation_status['has_event'] + annotation_status['not_event'] + annotation_status['pass']
+        annotation_status['anno_done_cost'] = annotation_status['has_event_cost'] + annotation_status['not_event_cost'] + annotation_status['pass_cost']
+        for key in status.keys():
+            status[key] += annotation_status[key]
+        user_progress.append((user, annotation_status))
+
+    Anno = Annotation
+    return render(request, 'progress.html', locals())

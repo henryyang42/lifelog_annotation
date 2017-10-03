@@ -1,0 +1,92 @@
+{% extends "layout.html" %} {% block annotation_progress %}
+<a class="navbar-brand" href="/annotation/logout/"> 登出 </a> {% endblock %} {% block body %}
+
+<div class="container-fluid">
+  <h2>標記進度</h2>
+  {% for user, annotation_status in user_progress %}
+  <div class="col-md-6">
+    <h3>{{user}}: </h3>{% include "annotation_status.html" %}
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th>標記狀態</th>
+          <th>筆數</th>
+          <th>總額</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>是 Event (7NTD)</td>
+          <td>{{annotation_status.has_event}}</td>
+          <td>{{annotation_status.has_event_cost}}</td>
+        </tr>
+        <tr>
+          <td>非 Event (1.5NTD)</td>
+          <td>{{annotation_status.not_event}}</td>
+          <td>{{annotation_status.not_event_cost}}</td>
+        </tr>
+        <tr>
+          <td>Pass (1.5NTD)</td>
+          <td>{{annotation_status.pass}}</td>
+          <td>{{annotation_status.pass_cost}}</td>
+        </tr>
+        <tr>
+          <td>已標記</td>
+          <td>{{annotation_status.anno_done}}</td>
+          <td>{{annotation_status.anno_done_cost}}</td>
+        </tr>
+        <tr>
+          <td>未標記</td>
+          <td>{{annotation_status.undone}}</td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  {% endfor %}
+
+  <script type="text/javascript">
+    $(function () {
+      $('div').removeClass('navbar-right navbar-text')
+    });
+  </script>
+  <div class="col-md-12">
+      <h3>總計</h3>
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>標記狀態</th>
+            <th>筆數</th>
+            <th>總額</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>是 Event (7NTD)</td>
+            <td>{{status.has_event}}</td>
+            <td>{{status.has_event_cost}}</td>
+          </tr>
+          <tr>
+            <td>非 Event (1.5NTD)</td>
+            <td>{{status.not_event}}</td>
+            <td>{{status.not_event_cost}}</td>
+          </tr>
+          <tr>
+            <td>Pass (1.5NTD)</td>
+            <td>{{status.pass}}</td>
+            <td>{{status.pass_cost}}</td>
+          </tr>
+          <tr>
+            <td>已標記</td>
+            <td>{{status.anno_done}}</td>
+            <td>{{status.anno_done_cost}}</td>
+          </tr>
+          <tr>
+            <td>未標記</td>
+            <td>{{status.undone}}</td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  {% endblock body %}

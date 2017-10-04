@@ -42,7 +42,7 @@ if __name__ == '__main__':
     normal_entries, golden_entries = get_entries()
 
     with open('accounts.txt', 'w') as f:
-        username = 'annotator_golden'
+        username = 'diary_annotator_golden'
         password = random_password()
         annotator_golden = User.objects.create_user(username, '', password)
         put_entries(golden_entries, annotator_golden)
@@ -50,7 +50,7 @@ if __name__ == '__main__':
 
         annotators = [annotator_golden]
         for i in range(n_accounts):
-            username = 'annotator00%d' % (i + 1)
+            username = 'diary_annotator00%d' % (i + 1)
             password = random_password()
             annotator = User.objects.create_user(username, '', password)
             put_entries(normal_entries[i::n_accounts] + list(golden_entries), annotator)

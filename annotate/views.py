@@ -67,7 +67,6 @@ def annotate(request):
         # pre_annotated_result
         pa = {
             'checkEvent': 'notEvent',
-            'imgDesc': '',
             'triples': [{'eventType': 'explicit', 'subject': '我', 'object': '', 'predicate': '', 'time': '發文時間'}],
             'frames': {},
             'frames_raw': {}}
@@ -115,7 +114,9 @@ def annotate(request):
             'user': POST['user'],
             'id': POST['id'],
             'checkEvent': POST['checkEvent'],
-            'imgDesc': POST.get('imgDesc'),
+            'imgDescEnvironment': POST.get('imgDescEnvironment'),
+            'imgDescIntention': POST.get('imgDescIntention'),
+            'imgDescConnection': POST.get('imgDescConnection'),
             'triples': [],
             'frames': {},
             'frames_raw': {}

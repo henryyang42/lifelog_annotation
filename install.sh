@@ -1,6 +1,7 @@
 pip3 install -r requirements.txt
-python3 manage.py makemigrations
-python3 manage.py migrate
-python3 scripts/init_db.py
-python3 scripts/insert_diaries.py
-python3 scripts/create_accounts.py
+python manage.py makemigrations
+python manage.py migrate
+python scripts/init_db.py
+python scripts/insert_diaries.py
+python scripts/insert_tweets.py
+python scripts/create_accounts.py

@@ -1,5 +1,5 @@
 import json
-
+import collections
 import jieba.posseg as pseg
 
 from access_django import *
@@ -49,12 +49,33 @@ from annotate.models import *
 """
 
 
+word2frame = collections.defaultdict(set)
+for lu in LexUnit.objects.all():
+    word2frame[lu.name].add(lu.frame.eng_name)
+
+
+def find_lu_fast(name):
+      return list(word2frame[name])
+
+
+def add_frames_fast(tokens):
+    tokens_ = []
+    for i, tok in enumerate(tokens):
+        tokens_.append({
+            'token': tok['token_cn'],
+            'pos': tok['pos'],
+            'frames': find_lu_fast(name=tok['token_cn']),
+            'token_i': i
+        })
+    return tokens_
+
+
 if __name__ == '__main__':
     with open('data/diary_frames_cn.json', encoding='utf8') as f:
         frames = json.load(f)
 
     for i, frame in enumerate(frames):
-        preprocessed_content = {'tokens': add_frames(frame['tokens'])}
+        preprocessed_content = {'tokens': add_frames_fast(frame['tokens'])}
         Entry.objects.create(
             content=frame['content_cn'],
             raw=json.dumps(frame, ensure_ascii=False),

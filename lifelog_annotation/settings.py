@@ -82,26 +82,26 @@ WSGI_APPLICATION = 'lifelog_annotation.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
-
-if DEBUG:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
+}
+# if DEBUG:
+    
 
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.mysql',  # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-            'NAME': 'thyang',
-            'USER': 'thyang',                       # Not used with sqlite3.
-            'PASSWORD': '8787',               # Not used with sqlite3.
-            'HOST': 'localhost',                           # Set to empty string for localhost. Not used with sqlite3.
-            'PORT': '3306',                           # Set to empty string for default. Not used with sqlite3.
-        }
-    }
+# else:
+#     DATABASES = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.mysql',  # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+#             'NAME': 'thyang',
+#             'USER': 'thyang',                       # Not used with sqlite3.
+#             'PASSWORD': '8787',               # Not used with sqlite3.
+#             'HOST': 'localhost',                           # Set to empty string for localhost. Not used with sqlite3.
+#             'PORT': '3306',                           # Set to empty string for default. Not used with sqlite3.
+#         }
+#     }
 
 
 # Password validation

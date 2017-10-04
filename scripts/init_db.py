@@ -103,28 +103,20 @@ def insert_frame(frame):
                 fe_type='NON_CORE'
             )[0]
         )
-    for lu in frame['lus']:
-        lu_split = lu[:-1].split('/')
-        if len(lu_split) != 2:
-            continue
-        name, pos = lu_split
-        LexUnit.objects.update_or_create(
-            name=name.strip(),
-            pos=pos.strip(),
-            frame=frame_obj
-        )
 
 
 def insert_lu(fname, lus):
-    frame_obj = FrameNet.objects.get(eng_name=fname.strip())
-    for lu in lus:
-        pos = list(pseg.cut(lu))[0].flag
-        LexUnit.objects.update_or_create(
-            name=lu.strip(),
-            pos=pos.strip(),
-            frame=frame_obj
-        )
-
+    try:
+        frame_obj = FrameNet.objects.get(eng_name=fname.strip())
+        for lu in lus:
+            pos = list(pseg.cut(lu))[0].flag
+            LexUnit.objects.update_or_create(
+                name=lu.strip(),
+                pos=pos.strip(),
+                frame=frame_obj
+            )
+    except:
+        print('insert_lu %s, %s failed' % (fname, lus))
 
 if __name__ == '__main__':
     with open('data/CFN_Frames.json', encoding='utf8') as f:
@@ -142,3 +134,8 @@ if __name__ == '__main__':
         frames = json.load(f)
         for fname, lus in frames.items():
             insert_lu(fname, lus)
+    
+    print('%d Frame, %d LU added.' % (
+        FrameNet.objects.all().count(),
+        LexUnit.objects.all().count(),
+    ))

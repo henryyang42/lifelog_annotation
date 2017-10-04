@@ -51,7 +51,7 @@ class LexUnit(models.Model):
     frame = models.ForeignKey(FrameNet)
 
     class Meta:
-        unique_together = ('name', 'pos', 'frame')
+        unique_together = ('name', 'frame')
 
     def as_dict(self):
         return {

@@ -5,7 +5,19 @@ import jieba.posseg as pseg
 from access_django import *
 from framenet.api import *
 from annotate.models import *
+import os.path
 
+file_word2frame = 'data/word2frame.json'
+word2frame = collections.defaultdict(set)
+if os.path.isfile(file_word2frame):
+    with open(file_word2frame, encoding='utf8') as f:
+        for k, v in json.load(f).items():
+            word2frame[k] = set(v)
+else:
+    for lu in LexUnit.objects.all():
+        word2frame[lu.name].add(lu.frame.eng_name)
+    with open(file_word2frame, 'w', encoding='utf8') as f:
+        f.write(json.dumps({k: list(v) for k, v in word2frame.items()}, ensure_ascii=False))
 """
 {
   "event":[],
@@ -47,12 +59,6 @@ from annotate.models import *
   ]
 }
 """
-
-
-word2frame = collections.defaultdict(set)
-for lu in LexUnit.objects.all():
-    word2frame[lu.name].add(lu.frame.eng_name)
-
 
 def find_lu_fast(name):
       return list(word2frame[name])

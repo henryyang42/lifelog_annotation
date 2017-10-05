@@ -123,7 +123,8 @@
   <br>
   <br>
   <br>
-  <input type="submit" class="btn btn-primary" value="送出" id="submit" style="margin-top:2%;margin-bottom:2%">
+  <input type="submit" class="btn btn-primary spin" value="送出" id="submit" style="margin-top:2%;margin-bottom:2%">
+  <img class="spin" style="display: none" src="/annotation/static/spin.svg" width="30">
 </form>
 
 
@@ -142,6 +143,11 @@
 
     //event.preventDefault();
   });
+  
+
+  $('.spin.btn').on('click', function () {
+    $('.spin').toggle()
+  })
 
 var id =  {{ pa.triples | length }} + 1;
 

@@ -165,8 +165,12 @@ def annotate(request):
             custom_lu_frame = POST.get('custom_lu_frame', '')
             if custom_lu_word and custom_lu_frame:
                 add_lu(custom_lu_word, custom_lu_frame)
-                diary = json.loads(entry.raw)
-                entry.preprocessed_content = json.dumps({'tokens': add_frames(diary['tokens'])}, ensure_ascii=False)
+                if entry.source_type == Entry.DIARY:
+                    diary = json.loads(entry.raw)
+                    entry.preprocessed_content = json.dumps({'tokens': add_frames(diary['tokens'])}, ensure_ascii=False)
+                else:
+                    tweet = json.loads(entry.preprocessed_content)
+                    entry.preprocessed_content = json.dumps({'tokens': add_frames(tweet['tokens'])}, ensure_ascii=False)
                 entry.save()
                 logger.info('%s ADD lu.name=%s lu.frame.fid=%s' % (user, custom_lu_word, custom_lu_frame))
             return redirect('/annotation/?id=%d' % entry.id)

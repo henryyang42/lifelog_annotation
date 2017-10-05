@@ -51,10 +51,11 @@ def tokenize_s(request):
 def add_frames(tokens):
     tokens_ = []
     for i, tok in enumerate(tokens):
+        token = tok.get('token_cn', '') or tok.get('token')
         tokens_.append({
-            'token': tok['token_cn'],
-            'pos': tok['pos'],
-            'frames': [lu['frame'] for lu in find_lu(name=tok['token_cn'])],
+            'token': token,
+            'pos': tok.get('pos', ''),
+            'frames': [lu['frame'] for lu in find_lu(name=token)],
             'token_i': i
         })
     return tokens_

@@ -23,7 +23,7 @@ def get_annotation_status(user):
     done_ct = Annotation.objects.filter(user=user, status=Annotation.DONE).count()
     pending_ct = Annotation.objects.filter(user=user, status=Annotation.PENDING).count()
     undone_ct = Annotation.objects.filter(user=user, status=Annotation.UNDONE).count()
-    smoothing = 200
+    smoothing = 300
     smct = len([ct for ct in [done_ct, pending_ct, undone_ct] if ct])
     return {
         'done_pct': done_ct and (done_ct + smoothing) / (all_ct + smct * smoothing) * 100,

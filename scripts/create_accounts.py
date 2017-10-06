@@ -42,21 +42,24 @@ if __name__ == '__main__':
     assert(Entry.objects.filter(source_type=Entry.TWEET, golden=True).count() == 100)
     assert(Entry.objects.filter(source_type=Entry.DIARY, golden=True).count() == 100)
 
-    diary_accounts = 5
-    tweet_accounts = 8
+    golden_accounts = 4
+    diary_accounts = 2
+    tweet_accounts = 6
 
     diary_normal, diary_golden = get_entries(Entry.DIARY)
     tweet_normal, tweet_golden = get_entries(Entry.TWEET)
 
     with open('accounts.txt', 'w') as f:
-        username = 'diary_annotator_golden'
-        password = random_password()
-        diary_annotator_golden = User.objects.create_user(username, '', password)
-        put_entries(diary_golden, diary_annotator_golden)
-        write_account_info(username, password, f)
-        print('%s created' % username)
+        diary_annotators = []
+        for i in range(golden_accounts):
+            username = 'diary_annotator_golden00%d' % (i + 1)
+            password = random_password()
+            diary_annotator_golden = User.objects.create_user(username, '', password)
+            put_entries(diary_golden, diary_annotator_golden)
+            write_account_info(username, password, f)
+            diary_annotators.append(diary_annotator_golden)
+            print('%s created' % username)
 
-        diary_annotators = [diary_annotator_golden]
         for i in range(diary_accounts):
             username = 'diary_annotator00%d' % (i + 1)
             password = random_password()
@@ -65,15 +68,17 @@ if __name__ == '__main__':
             write_account_info(username, password, f)
             diary_annotators.append(annotator)
             print('%s created' % username)
+        
+        tweet_annotators = []
+        for i in range(golden_accounts):
+            username = 'tweet_annotator_golden00%d' % (i + 1)
+            password = random_password()
+            tweet_annotator_golden = User.objects.create_user(username, '', password)
+            put_entries(tweet_golden, tweet_annotator_golden)
+            write_account_info(username, password, f)
+            tweet_annotators.append(tweet_annotator_golden)
+            print('%s created' % username)
 
-        username = 'tweet_annotator_golden'
-        password = random_password()
-        tweet_annotator_golden = User.objects.create_user(username, '', password)
-        put_entries(tweet_golden, tweet_annotator_golden)
-        write_account_info(username, password, f)
-        print('%s created' % username)
-
-        tweet_annotators = [tweet_annotator_golden]
         for i in range(tweet_accounts):
             username = 'tweet_annotator00%d' % (i + 1)
             password = random_password()
@@ -108,3 +113,18 @@ if __name__ == '__main__':
         all_entries |= entry_set - tweet_golden_set
 
     assert(tweet_normal_set == all_entries)
+
+    url = 'http://nlg17.csie.ntu.edu.tw/annotation'
+    with open('golden_info.txt', 'w') as f:
+        print('Diary_Golden_Id:', file=f)
+        print(str(diary_golden_set), file=f)
+        print('========================', file=f)
+        for id_ in diary_golden_set:
+            print('%s/?id=%d' % (url, id_), file=f)
+
+        print('Tweet_Golden_Id:', file=f)
+        print(str(tweet_golden_set), file=f)
+        print('========================', file=f)
+        for id_ in tweet_golden_set:
+            print('%s/?id=%d' % (url, id_), file=f)
+

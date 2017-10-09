@@ -239,3 +239,23 @@ def progress(request):
 
     Anno = Annotation
     return render(request, 'progress.html', locals())
+
+
+@login_required(login_url='/annotation/login')
+def download_annotation(request):
+    user = request.user
+    annotated_data = []
+    username = request.GET.get('user', user.username)
+    user = get_object_or_404(User, username=username)
+    for annotation in Annotation.objects.filter(user=user, status=Annotation.DONE):
+        try:
+            preprocessed_content = json.loads(annotation.entry.preprocessed_content)
+            annotation = json.loads(annotation.annotation)
+            annotated_data.append({
+                'preprocessed_content': preprocessed_content,
+                'annotation': annotation})
+        except:
+            pass
+    response = HttpResponse(json.dumps(annotated_data, ensure_ascii=False), content_type='application/json')
+    response['Content-Disposition'] = 'attachment; filename="%s.json"' % user.username
+    return response

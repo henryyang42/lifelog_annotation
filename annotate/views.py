@@ -170,7 +170,7 @@ def annotate(request):
                 add_lu(custom_lu_word, custom_lu_frame)
                 preprocessed_content = json.loads(annotation.preprocessed_content)
                 targets = preprocessed_content.get('targets', []) + [custom_lu_word]
-                tokens = add_frames_with_targets(annotation.entry.content, targets)
+                tokens = add_frames_with_targets(annotation.entry.content, targets + [annotation.entry.author])
                 annotation.preprocessed_content = json.dumps({'tokens': tokens, 'targets': targets}, ensure_ascii=False)
                 annotation.save()
                 logger.info('%s ADD lu.name=%s lu.frame.fid=%s' % (user, custom_lu_word, custom_lu_frame))
@@ -246,10 +246,11 @@ def progress(request):
 def make_framenet(request):
     user = request.user
     if request.method == 'POST':
-        targets = json.loads(request.POST['targets'])
         annotation = get_object_or_404(Annotation, id=request.POST['annotation_id'])
+        targets = json.loads(request.POST['targets']) + [annotation.entry.author]
 
         tokens = add_frames_with_targets(annotation.entry.content, targets)
+        print(tokens)
         annotation.preprocessed_content = json.dumps({'tokens': tokens, 'targets': targets}, ensure_ascii=False)
         annotation.save()
         sentence = tokens

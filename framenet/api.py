@@ -73,7 +73,7 @@ def add_frames_with_targets(content, targets):
             content_new += list(chain(*[[c, target] for c in ctx_split[:-1]])) + ctx_split[-1:]
         content = content_new
     tokens = []
-    for tok in content:
+    for tok in [t for t in content if t]:
         if tok not in targets:
             tokens += list(tok)
         else:

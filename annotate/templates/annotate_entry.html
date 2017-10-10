@@ -173,6 +173,7 @@ $(document).ready(function(){
       targets.push(this.value)
     })
     console.log(targets)
+    $('#annotate-frame').html('<img style="margin:2em" src="/annotation/static/spin.svg" width="30">')
     $.ajax({
       url: "/annotation/make_framenet/",
       method: 'POST',

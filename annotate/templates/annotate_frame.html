@@ -89,35 +89,37 @@
         var evokerIndex = selectedFrame.split("-")[0]
         console.log(selectedFrame.split("-"))
         $("input[name^='" + selectedFrame + "']").each(function (_, argInput) {
-          var selectedIndex = $(argInput).val()
-          if (selectedIndex == "") return
-          var st, ed;
-          var split_ind = selectedIndex.split('-')
-          console.log(split_ind)
-          if (split_ind.length == 2) {
-            st = Number(split_ind[0])
-            ed = Number(split_ind[1])
-          } else if (split_ind.length == 1) {
-            st = ed = Number(split_ind[0])
-          } else {
-            return
-          }
-          console.log(st, ed)
-          var feAbbrev = $(argInput).data("abbrev")
-          for (var selectedIndex = st; selectedIndex <= ed; selectedIndex++) {
-            var elem = $(document.createElement('div'))
-            elem.attr("id", "#token-string-" + selectedIndex +
-              " div.word-arg-marker.evoker-" + evokerIndex)
-            elem.text(feAbbrev)
-            elem.addClass("word-arg-marker");
-            elem.addClass("evoker-" + evokerIndex);
-            elem.addClass("evoker");
-
-            if (evokerIndex == activeTokenIndex()) {
-              elem.addClass("active");
+          var selectedIndexStr = $(argInput).val()
+          if (selectedIndexStr == "") return
+          for(var selectedIndex of selectedIndexStr.split(',')){
+            var st, ed;
+            var split_ind = selectedIndex.split('-')
+            console.log(split_ind)
+            if (split_ind.length == 2) {
+              st = Number(split_ind[0])
+              ed = Number(split_ind[1])
+            } else if (split_ind.length == 1 && split_ind[0] != '') {
+              st = ed = Number(split_ind[0])
+            } else {
+              return
             }
+            console.log(st, ed)
+            var feAbbrev = $(argInput).data("abbrev")
+            for (var selectedIndex = st; selectedIndex <= ed; selectedIndex++) {
+              var elem = $(document.createElement('div'))
+              elem.attr("id", "#token-string-" + selectedIndex +
+                " div.word-arg-marker.evoker-" + evokerIndex)
+              elem.text(feAbbrev)
+              elem.addClass("word-arg-marker");
+              elem.addClass("evoker-" + evokerIndex);
+              elem.addClass("evoker");
 
-            $("#token-string-" + selectedIndex).prepend(elem)
+              if (evokerIndex == activeTokenIndex()) {
+                elem.addClass("active");
+              }
+
+              $("#token-string-" + selectedIndex).prepend(elem)
+            }
           }
         })
       }

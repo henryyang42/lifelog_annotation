@@ -44,8 +44,8 @@ if __name__ == '__main__':
     assert(Entry.objects.filter(source_type=Entry.DIARY, golden=True).count() == 100)
 
     golden_accounts = 4
-    diary_accounts = 2
-    tweet_accounts = 6
+    diary_accounts = 3
+    tweet_accounts = 8
 
     diary_normal, diary_golden = get_entries(Entry.DIARY)
     tweet_normal, tweet_golden = get_entries(Entry.TWEET)

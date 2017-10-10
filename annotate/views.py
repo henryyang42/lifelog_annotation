@@ -76,7 +76,6 @@ def annotate(request):
                 pa = json.loads(annotation.annotation)
             except:
                 pass
-        print(annotation.id, annotation.annotation)
 
         print(pa)
         pre_annotations = []

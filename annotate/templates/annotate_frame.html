@@ -14,20 +14,13 @@
     </div>
   </div>
 </div>
-
 <div class="sentence lead">
 {% for token in sentence %}
 <div class="token" id="token-string-{{ token.token_i }}">
-
-    <div class="word">
-    {% if token.frames %}
-    <a href="#token-tab-{{ token.token_i }}" data-toggle="tab" data-token-i="{{ token.token_i }}">
-                        {{ token.token }}
-                    </a> {% else %} {{ token.token }} {% endif %}
-    </div>
-    <div class="word-index">{{ token.token_i }}</div>
-
-    <div class="pos">{{ token.pos }}</div>
+  {% if token.frames %}
+    <a href="#token-tab-{{ token.token_i }}" data-toggle="tab" data-token-i="{{ token.token_i }}">{{ token.token }}</a>
+  {% else %}{{ token.token }}{% endif %}
+  <div class="word-index">{{ token.token_i }}</div>
 </div>
 {% endfor %}
 </div>

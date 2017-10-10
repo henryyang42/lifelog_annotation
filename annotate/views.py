@@ -13,11 +13,6 @@ import jieba.posseg as pseg
 logger = logging.getLogger(__name__)
 
 
-def color_map(index):
-    colors = ['red', 'green', 'blue', 'yellow', 'orange']
-    return colors[index % len(colors)]
-
-
 def get_annotation_status(user):
     all_ct = Annotation.objects.filter(user=user).count()
     done_ct = Annotation.objects.filter(user=user, status=Annotation.DONE).count()
@@ -44,6 +39,30 @@ def add_lu(name, fid):
         LexUnit.objects.create(frame=frame, name=name, pos=pos)
     except:
         pass
+
+
+def get_pre_annotations(sentence, pa={'frames': {}}):
+    pre_annotations = []
+    for i, token in enumerate(sentence):
+        if token['frames']:
+            pre_annotation = {'token': token,
+                              'frames': [],
+                              'i': token['token_i']}
+            for frame_name in token['frames']:
+                frame = get_fn(eng_name=frame_name).as_dict()
+                annotated_frame = pa['frames'].get(str(token['token_i']), {})
+                if annotated_frame and annotated_frame.get('fname') == frame_name:
+                    frame['selected'] = True
+                frame_elems_by_type = defaultdict(list)
+                for fe in frame['frame_elements']:
+                    if annotated_frame and annotated_frame.get('fname') == frame_name:
+                        fe['value'] = annotated_frame['fe'].get(fe['eng_name'], '')
+                    frame_elems_by_type[fe['fe_type']].append(fe)
+                frame['fe_by_type'] = frame_elems_by_type
+                pre_annotation['frames'].append(frame)
+            pre_annotations.append(pre_annotation)
+
+    return pre_annotations
 
 
 @login_required(login_url='/annotation/login')
@@ -78,29 +97,14 @@ def annotate(request):
                 pass
 
         print(pa)
-        pre_annotations = []
-        sentence = json.loads(entry.preprocessed_content)
-        if 'tokens' in sentence:
-            sentence = sentence['tokens']
-        for i, token in enumerate(sentence):
-            if token['frames']:
-                pre_annotation = {'token': token,
-                                  'frames': [],
-                                  'i': token['token_i'],
-                                  'color': color_map(i)}
-                for frame_name in token['frames']:
-                    frame = get_fn(eng_name=frame_name).as_dict()
-                    annotated_frame = pa['frames'].get(str(token['token_i']), {})
-                    if annotated_frame and annotated_frame.get('fname') == frame_name:
-                        frame['selected'] = True
-                    frame_elems_by_type = defaultdict(list)
-                    for fe in frame['frame_elements']:
-                        if annotated_frame and annotated_frame.get('fname') == frame_name:
-                            fe['value'] = annotated_frame['fe'].get(fe['eng_name'], '')
-                        frame_elems_by_type[fe['fe_type']].append(fe)
-                    frame['fe_by_type'] = frame_elems_by_type
-                    pre_annotation['frames'].append(frame)
-                pre_annotations.append(pre_annotation)
+        sentence = {}
+        try:
+            sentence = json.loads(annotation.preprocessed_content)
+        except:
+            pass
+
+        sentence = sentence.get('tokens', [])
+        pre_annotations = get_pre_annotations(sentence, pa)
 
         return render(request, 'annotate_entry.html', locals())
 
@@ -110,7 +114,7 @@ def annotate(request):
         entry = get_object_or_404(Entry, id=POST['id'])
         annotation = get_object_or_404(Annotation, user=user, entry=entry)
         annotated_result = {
-            'user': POST['user'],
+            'author': POST['author'],
             'id': POST['id'],
             'checkEvent': POST['checkEvent'],
             'imgDescEnvironment': POST.get('imgDescEnvironment'),
@@ -164,13 +168,11 @@ def annotate(request):
             custom_lu_frame = POST.get('custom_lu_frame', '')
             if custom_lu_word and custom_lu_frame:
                 add_lu(custom_lu_word, custom_lu_frame)
-                if entry.source_type == Entry.DIARY:
-                    diary = json.loads(entry.raw)
-                    entry.preprocessed_content = json.dumps({'tokens': add_frames(diary['tokens'])}, ensure_ascii=False)
-                else:
-                    tweet = json.loads(entry.preprocessed_content)
-                    entry.preprocessed_content = json.dumps({'tokens': add_frames(tweet['tokens'])}, ensure_ascii=False)
-                entry.save()
+                preprocessed_content = json.loads(annotation.preprocessed_content)
+                targets = preprocessed_content.get('targets', []) + [custom_lu_word]
+                tokens = add_frames_with_targets(annotation.entry.content, targets)
+                annotation.preprocessed_content = json.dumps({'tokens': tokens, 'targets': targets}, ensure_ascii=False)
+                annotation.save()
                 logger.info('%s ADD lu.name=%s lu.frame.fid=%s' % (user, custom_lu_word, custom_lu_frame))
             return redirect('/annotation/?id=%d' % entry.id)
         return redirect('/annotation/')
@@ -241,6 +243,21 @@ def progress(request):
 
 
 @login_required(login_url='/annotation/login')
+def make_framenet(request):
+    user = request.user
+    if request.method == 'POST':
+        targets = json.loads(request.POST['targets'])
+        annotation = get_object_or_404(Annotation, id=request.POST['annotation_id'])
+
+        tokens = add_frames_with_targets(annotation.entry.content, targets)
+        annotation.preprocessed_content = json.dumps({'tokens': tokens, 'targets': targets}, ensure_ascii=False)
+        annotation.save()
+        sentence = tokens
+        pre_annotations = get_pre_annotations(sentence)
+        return render(request, 'annotate_frame.html', locals())
+
+
+@login_required(login_url='/annotation/login')
 def download_annotation(request):
     user = request.user
     annotated_data = []
@@ -248,7 +265,7 @@ def download_annotation(request):
     user = get_object_or_404(User, username=username)
     for annotation in Annotation.objects.filter(user=user, status=Annotation.DONE):
         try:
-            preprocessed_content = json.loads(annotation.entry.preprocessed_content)
+            preprocessed_content = json.loads(annotation.preprocessed_content)
             annotation = json.loads(annotation.annotation)
             annotated_data.append({
                 'preprocessed_content': preprocessed_content,

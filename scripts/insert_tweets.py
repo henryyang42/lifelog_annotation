@@ -32,8 +32,9 @@ else:
 30208,olivia4ever ::: 203101545968054272 ::: @seansay 第二 集 是 “ 主食 的 故事 ” 说 到 了 西安 的馍 ~ （ 好 想念 ）
 """
 
+
 def find_lu_fast(name):
-      return list(word2frame[name])
+    return list(word2frame[name])
 
 
 def add_frames_fast(tokens):
@@ -62,13 +63,13 @@ if __name__ == '__main__':
                 content += '{}: {}\n\n'.format(author, text)
                 raw_content += '{}: {}\n\n'.format(author, ''.join(text.split()))
 
-            preprocessed_content = {'tokens': add_frames_fast(content.split())}
+            # preprocessed_content = {'tokens': add_frames_fast(content.split())}
 
             try:
                 Entry.objects.create(
                     content=raw_content,
                     raw=str(row),
-                    preprocessed_content=json.dumps(preprocessed_content, ensure_ascii=False),
+                    # preprocessed_content=json.dumps(preprocessed_content, ensure_ascii=False),
                     author=author,
                     source_type=Entry.TWEET,
                     media='' if img_mapping[row[0]] == 'None' else img_mapping[row[0]],

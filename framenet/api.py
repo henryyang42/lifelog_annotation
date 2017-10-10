@@ -1,6 +1,7 @@
 from django.http import HttpResponse, JsonResponse
 from .models import *
 import jieba.posseg as pseg
+from itertools import chain
 
 
 def find_lu(**kwargs):
@@ -56,6 +57,33 @@ def add_frames(tokens):
             'token': token,
             'pos': tok.get('pos', ''),
             'frames': [lu['frame'] for lu in find_lu(name=token)],
+            'token_i': i
+        })
+    return tokens_
+
+
+def add_frames_with_targets(content, targets):
+    content = [content]
+    for target in targets:
+        if not target:
+            continue
+        content_new = []
+        for ctx in content:
+            ctx_split = ctx.split(target)
+            content_new += list(chain(*[[c, target] for c in ctx_split[:-1]])) + ctx_split[-1:]
+        content = content_new
+    tokens = []
+    for tok in content:
+        if tok not in targets:
+            tokens += list(tok)
+        else:
+            tokens.append(tok)
+
+    tokens_ = []
+    for i, tok in enumerate(tokens):
+        tokens_.append({
+            'token': tok,
+            'frames': [lu['frame'] for lu in find_lu(name=tok)] if tok in targets else [],
             'token_i': i
         })
     return tokens_

@@ -60,8 +60,9 @@ else:
 }
 """
 
+
 def find_lu_fast(name):
-      return list(word2frame[name])
+    return list(word2frame[name])
 
 
 def add_frames_fast(tokens):
@@ -81,11 +82,11 @@ if __name__ == '__main__':
         frames = json.load(f)
 
     for i, frame in enumerate(frames):
-        preprocessed_content = {'tokens': add_frames_fast(frame['tokens'])}
+        # preprocessed_content = {'tokens': add_frames_fast(frame['tokens'])}
         Entry.objects.create(
             content=frame['content_cn'],
             raw=json.dumps(frame, ensure_ascii=False),
-            preprocessed_content=json.dumps(preprocessed_content, ensure_ascii=False),
+            # preprocessed_content=json.dumps(preprocessed_content, ensure_ascii=False),
             author='楊基振',
             source_type=Entry.DIARY,
             source_id=frame['id'],

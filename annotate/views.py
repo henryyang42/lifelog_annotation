@@ -86,7 +86,7 @@ def annotate(request):
         # pre_annotated_result
         pa = {
             'checkEvent': 'notEvent',
-            'triples': [{'eventType': 'explicit', 'subject': '我', 'object': '', 'predicate': '', 'time': '發文時間'}],
+            'triples': [{'eventType': 'explicit', 'subject': entry.author, 'object': '', 'predicate': '', 'time': '發文時間'}],
             'frames': {},
             'frames_raw': {}}
 
@@ -248,9 +248,8 @@ def make_framenet(request):
     if request.method == 'POST':
         annotation = get_object_or_404(Annotation, id=request.POST['annotation_id'])
         targets = json.loads(request.POST['targets']) + [annotation.entry.author]
-
         tokens = add_frames_with_targets(annotation.entry.content, targets)
-        print(tokens)
+
         annotation.preprocessed_content = json.dumps({'tokens': tokens, 'targets': targets}, ensure_ascii=False)
         annotation.save()
         sentence = tokens

@@ -216,7 +216,7 @@ function addRow (id) {
         </label>
       <td>
         <div class="input-group">
-          <input type="text" class="form-control" value="我" name="subject${id}" id="subject${id}"/>
+          <input type="text" class="form-control" value="{{ entry.author }}" name="subject${id}" id="subject${id}"/>
           <span class="input-group-btn">
             <input type="button" class="btn btn-default" value="貼上" onclick="getSelectedText(boxName1,${id});">
           </span>

@@ -209,31 +209,37 @@ def progress(request):
     status = {
         'not_event_cost': 0.0,
         'has_event_cost': 0.0,
+        'has_event_media_cost': 0.0,
         'anno_done_cost': 0.0,
         'pass_cost': 0,
         'not_event': 0,
         'has_event': 0,
+        'has_event_media': 0,
         'anno_done': 0,
         'pass': 0,
         'undone': 0
     }
     for user in User.objects.all():
         annotation_status = get_annotation_status(user)
-        annotation_status['has_event'], annotation_status['not_event'] = 0, 0
+        annotation_status['has_event_media'], annotation_status['has_event'], annotation_status['not_event'] = 0, 0, 0
         for annotation in Annotation.objects.filter(user=user, status=Annotation.DONE):
             try:
                 anno = json.loads(annotation.annotation)
                 if anno['checkEvent'] == 'hasEvent':
-                    annotation_status['has_event'] += 1
+                    if annotation.entry.media:
+                        annotation_status['has_event_media'] += 1
+                    else:
+                        annotation_status['has_event'] += 1
                 elif anno['checkEvent'] == 'notEvent':
                     annotation_status['not_event'] += 1
             except:
                 pass
+        annotation_status['has_event_media_cost'] = annotation_status['has_event_media'] * 9.0
         annotation_status['has_event_cost'] = annotation_status['has_event'] * 7.0
         annotation_status['not_event_cost'] = annotation_status['not_event'] * 1.5
         annotation_status['pass_cost'] = annotation_status['pass'] * 1.5
         annotation_status['anno_done'] = annotation_status['has_event'] + annotation_status['not_event'] + annotation_status['pass']
-        annotation_status['anno_done_cost'] = annotation_status['has_event_cost'] + annotation_status['not_event_cost'] + annotation_status['pass_cost']
+        annotation_status['anno_done_cost'] = annotation_status['has_event_media_cost'] + annotation_status['has_event_cost'] + annotation_status['not_event_cost'] + annotation_status['pass_cost']
         for key in status.keys():
             status[key] += annotation_status[key]
         user_progress.append((user, annotation_status))

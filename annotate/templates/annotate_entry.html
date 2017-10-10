@@ -186,7 +186,6 @@ $(document).ready(function(){
       complete: function(data) {
         if(data.status === 200){
           $('#annotate-frame').html(data.responseText);
-          console.log(data.responseText)
         }
       }
     });

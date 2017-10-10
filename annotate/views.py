@@ -220,6 +220,8 @@ def progress(request):
         'undone': 0
     }
     for user in User.objects.all():
+        if 'annotator' not in user.username:
+            continue
         annotation_status = get_annotation_status(user)
         annotation_status['has_event_media'], annotation_status['has_event'], annotation_status['not_event'] = 0, 0, 0
         for annotation in Annotation.objects.filter(user=user, status=Annotation.DONE):
@@ -266,18 +268,30 @@ def make_framenet(request):
 @login_required(login_url='/annotation/login')
 def download_annotation(request):
     user = request.user
-    annotated_data = []
+    annotated_entry = []
     username = request.GET.get('user', user.username)
     user = get_object_or_404(User, username=username)
-    for annotation in Annotation.objects.filter(user=user, status=Annotation.DONE):
+    error = 0
+    for annotation in Annotation.objects.filter(user=user, status__in=[Annotation.DONE, Annotation.PENDING]):
+        preprocessed_content = {}
+        annotation_ = {}
+        try:
+            annotation_ = json.loads(annotation.annotation)
+        except:
+            error += 1
         try:
             preprocessed_content = json.loads(annotation.preprocessed_content)
-            annotation = json.loads(annotation.annotation)
-            annotated_data.append({
-                'preprocessed_content': preprocessed_content,
-                'annotation': annotation})
         except:
             pass
-    response = HttpResponse(json.dumps(annotated_data, ensure_ascii=False), content_type='application/json')
+
+        annotated_entry.append({
+            'preprocessed_content': preprocessed_content,
+            'annotation': annotation_})
+
+    status = get_annotation_status(user)
+    summary = {k: status[k] for k in ['done', 'undone', 'pass']}
+    summary['error'] = error
+
+    response = HttpResponse(json.dumps({'annotated_entry': annotated_entry, 'summary': summary}, ensure_ascii=False), content_type='application/json')
     response['Content-Disposition'] = 'attachment; filename="%s.json"' % user.username
     return response

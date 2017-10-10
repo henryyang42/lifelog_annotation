@@ -7,18 +7,6 @@ from framenet.api import *
 from annotate.models import *
 import os.path
 
-file_word2frame = 'data/word2frame.json'
-word2frame = collections.defaultdict(set)
-if os.path.isfile(file_word2frame):
-    with open(file_word2frame, encoding='utf8') as f:
-        for k, v in json.load(f).items():
-            word2frame[k] = set(v)
-else:
-    for lu in LexUnit.objects.all():
-        word2frame[lu.name].add(lu.frame.eng_name)
-    with open(file_word2frame, 'w', encoding='utf8') as f:
-        f.write(json.dumps({k: list(v) for k, v in word2frame.items()}, ensure_ascii=False))
-
 """
 30197,ibirdu ::: 9865093633 ::: 发现 了 个 小 客户端 。 。 。 itsy 还 不错 ， 如果 要 是 黑色 theme 就 好 了
 30199,olivia4ever ::: 28123918971699200 ::: 最近 还 蛮 喜欢 读 几 个 日本 作家 的 书 的 清清 淡淡 在 冬天 有 别样 感觉
@@ -31,23 +19,6 @@ else:
 30207,justissam ::: 429190744209780736 ::: 吃饱 度 姑中｡ 在 天 祥 天主堂
 30208,olivia4ever ::: 203101545968054272 ::: @seansay 第二 集 是 “ 主食 的 故事 ” 说 到 了 西安 的馍 ~ （ 好 想念 ）
 """
-
-
-def find_lu_fast(name):
-    return list(word2frame[name])
-
-
-def add_frames_fast(tokens):
-    tokens_ = []
-    for i, tok in enumerate(tokens):
-        tokens_.append({
-            'token': tok.strip(),
-            'pos': '',
-            'frames': find_lu_fast(name=tok.strip()),
-            'token_i': i
-        })
-    return tokens_
-
 
 if __name__ == '__main__':
     with open('data/img_mapping.json') as f:
@@ -63,13 +34,10 @@ if __name__ == '__main__':
                 content += '{}: {}\n\n'.format(author, text)
                 raw_content += '{}: {}\n\n'.format(author, ''.join(text.split()))
 
-            # preprocessed_content = {'tokens': add_frames_fast(content.split())}
-
             try:
                 Entry.objects.create(
                     content=raw_content,
                     raw=str(row),
-                    # preprocessed_content=json.dumps(preprocessed_content, ensure_ascii=False),
                     author=author,
                     source_type=Entry.TWEET,
                     media='' if img_mapping[row[0]] == 'None' else img_mapping[row[0]],

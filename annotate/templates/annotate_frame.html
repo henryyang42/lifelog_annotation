@@ -16,12 +16,16 @@
 </div>
 <div class="sentence lead">
 {% for token in sentence %}
+{% if token.token == "LINEBREAK" %}
+<br>
+{% else %}
 <div class="token" id="token-string-{{ token.token_i }}">
   {% if token.frames %}
     <a href="#token-tab-{{ token.token_i }}" data-toggle="tab" data-token-i="{{ token.token_i }}">{{ token.token }}</a>
   {% else %}{{ token.token }}{% endif %}
   <div class="word-index">{{ token.token_i }}</div>
 </div>
+{% endif %}
 {% endfor %}
 </div>
 

@@ -81,6 +81,8 @@ def add_frames_with_targets(content, targets):
 
     tokens_ = []
     for i, tok in enumerate(tokens):
+        if tok == '\n':
+            tok = 'LINEBREAK'
         tokens_.append({
             'token': tok,
             'frames': [lu['frame'] for lu in find_lu(name=tok)] if tok in targets else [],

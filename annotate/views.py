@@ -148,9 +148,16 @@ def annotate(request):
                         annotated_result['frames'][token_i] = frame
                     elif len(ksplit) == 3:
                         token_i = ksplit[0]
-                        frame = annotated_result['frames'].get(token_i, {'fe': {}})
+                        fname = ksplit[1]
                         fe = ksplit[2]
-                        frame['fe'][fe] = v
+                        fe_type = 'NON_CORE'
+                        try:
+                            fn = FrameNet.objects.get(eng_name=fname)
+                            fe_type = fn.frame_elements.get(eng_name=fe).fe_type
+                        except:
+                            pass
+                        frame = annotated_result['frames'].get(token_i, {'fe': {}})
+                        frame['fe'][fe] = {'index': v, 'fe_type': fe_type}
                         annotated_result['frames'][token_i] = frame
 
         if POST['checkEvent'] == 'pass':
@@ -175,6 +182,18 @@ def annotate(request):
                 annotation.save()
                 logger.info('%s ADD lu.name=%s lu.frame.fid=%s' % (user, custom_lu_word, custom_lu_frame))
             return redirect('/annotation/?id=%d' % entry.id)
+
+        if 'make_framenet' in POST.keys():
+
+            targets = [triple['predicate'] for triple in annotated_result['triples']] + [annotation.entry.author]
+            tokens = add_frames_with_targets(annotation.entry.content, targets)
+
+            annotation.preprocessed_content = json.dumps({'tokens': tokens, 'targets': targets}, ensure_ascii=False)
+            annotation.save()
+            sentence = tokens
+            pre_annotations = get_pre_annotations(sentence)
+            return redirect('/annotation/?id=%d' % entry.id)
+
         return redirect('/annotation/')
 
 

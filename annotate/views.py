@@ -143,21 +143,24 @@ def annotate(request):
                     ksplit = k.split('-')
                     if ksplit[0] == 'select':
                         token_i = ksplit[1]
-                        frame = annotated_result['frames'].get(token_i, {'fe': {}})
+                        frame = annotated_result['frames'].get(token_i, {'core_fe': {}, 'noncore_fe': {}, 'fe': {}})
                         frame['fname'] = v.split('-')[1]
                         annotated_result['frames'][token_i] = frame
                     elif len(ksplit) == 3:
                         token_i = ksplit[0]
                         fname = ksplit[1]
                         fe = ksplit[2]
-                        fe_type = 'NON_CORE'
+                        fe_type = 'noncore_fe'
                         try:
                             fn = FrameNet.objects.get(eng_name=fname)
-                            fe_type = fn.frame_elements.get(eng_name=fe).fe_type
+                            if fn.frame_elements.get(eng_name=fe).fe_type == 'CORE':
+                                fe_type = 'core_fe'
                         except:
                             pass
-                        frame = annotated_result['frames'].get(token_i, {'fe': {}})
-                        frame['fe'][fe] = {'index': v, 'fe_type': fe_type}
+
+                        frame = annotated_result['frames'].get(token_i, {'core_fe': {}, 'noncore_fe': {}, 'fe': {}})
+                        frame[fe_type][fe] = v
+                        frame['fe'][fe] = v
                         annotated_result['frames'][token_i] = frame
 
         if POST['checkEvent'] == 'pass':

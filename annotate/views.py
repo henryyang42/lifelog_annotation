@@ -176,11 +176,18 @@ def annotate(request):
         if 'add_lu' in POST.keys():
             custom_lu_word = POST.get('custom_lu_word', '')
             custom_lu_frame = POST.get('custom_lu_frame', '')
-            if custom_lu_word and custom_lu_frame:
-                add_lu(custom_lu_word, custom_lu_frame)
+            custom_lu_type = POST.get('custom_lu_type')
+            if custom_lu_word:
+                if custom_lu_frame:
+                    add_lu(custom_lu_word, custom_lu_frame)
                 preprocessed_content = json.loads(annotation.preprocessed_content)
                 targets = preprocessed_content.get('targets', []) + [custom_lu_word]
-                tokens = add_frames_with_targets(annotation.entry.content, targets + [annotation.entry.author])
+                content = annotation.entry.content
+                if custom_lu_type == 'implicit':
+                    content += '\n' + custom_lu_word
+                    annotation.entry.content = content
+                    annotation.entry.save()
+                tokens = add_frames_with_targets(content, targets + [annotation.entry.author])
                 annotation.preprocessed_content = json.dumps({'tokens': tokens, 'targets': targets}, ensure_ascii=False)
                 annotation.save()
                 logger.info('%s ADD lu.name=%s lu.frame.fid=%s' % (user, custom_lu_word, custom_lu_frame))
